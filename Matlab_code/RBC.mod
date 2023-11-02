@@ -58,7 +58,7 @@ steady;
 
 % solution with perturbation
 shocks;
-var ea = 0.01;
+var ea; periods 3:5 6; values 0.01 0.005;
 end;
 
 @#include "util.txt" 

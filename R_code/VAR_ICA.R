@@ -3,7 +3,7 @@ library(tseries)
 library(tidyverse)
 library(stargazer)
 library(fastICA)
-rm(list=ls())
+rm(list=ls());
 
 #%slicing 1973:Q1 - 2021:Q1 (251, io uso 247 per evitare covid)
 Q1_1971=59;
@@ -46,13 +46,49 @@ print(VARselect(D)$selection) #it give with AIC 3
 lag=3
 print(VARselect(Dlev)$selection) #it give with AIC 2
 #laglev
+
 #Estimate
 ?VAR
 Est = VAR(D, p=lag, type= "none");
 Estlev = VAR(Dlev, p=lag, type= "none");
-summary(Est)
+summary (Estlev)
 
-#prova
+#Get the error term
+B=Bcoef(Estlev);
+B1=B[,1:5]
+B2=B[,6:10]
+B3=B[,11:15]
+
+mat=matrix(c(Y,C,P,N,W), nrow=965/5, ncol=5)
+U = matrix(0, nrow = 5, ncol = 190);
+
+t=0
+for (t in 4:193){
+  U[1:5,t-3]= t(t(mat[t,]))-B1%*%t(t(mat[t-1,]))+B2%*%t(t(mat[t-2,]))+B3%*%t(t(mat[t-3,]));
+}
+
+#Identifying the contemporaneous reletionship matrix A0
+
+library(fastICA)
+U=t(U)
+
+X= fastICA(U, 5, alg.typ = "parallel", fun = "logcosh", alpha = 1,
+           method = "C", row.norm = FALSE, maxit = 200,
+           tol = 0.0001, verbose = TRUE)
+MixingMat=X$A
+
+A0=solve(MixingMat);
+
+#getting the SVAR Matrix
+
+A1=A0%*%B1;
+A2=A0%*%B2;
+A3=A0%*%B3;
+
+
+
+
+
 
 
 
