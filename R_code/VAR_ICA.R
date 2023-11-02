@@ -52,8 +52,7 @@ Est = VAR(D, p=lag, type= "none");
 Estlev = VAR(Dlev, p=lag, type= "none");
 summary(Est)
 
-u=Yd
-
+#prova
 
 
 
