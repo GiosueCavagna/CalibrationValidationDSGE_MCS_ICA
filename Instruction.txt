@@ -1,0 +1,4 @@
+In order to charge new file:
+  git add "new_file_name"
+  git commit -m "message related to add new file"
+  git push origin
