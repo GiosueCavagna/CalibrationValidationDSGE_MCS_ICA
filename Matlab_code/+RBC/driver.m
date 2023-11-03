@@ -161,11 +161,8 @@ steady;
 %
 % SHOCKS instructions
 %
-M_.det_shocks = [ M_.det_shocks;
-struct('exo_det',0,'exo_id',1,'multiplicative',0,'periods',3:5,'value',0.01) ];
-M_.det_shocks = [ M_.det_shocks;
-struct('exo_det',0,'exo_id',1,'multiplicative',0,'periods',6:6,'value',0.005) ];
 M_.exo_det_length = 0;
+M_.Sigma_e(1, 1) = 1;
 options_.irf = 0;
 options_.nocorr = true;
 options_.nofunctions = true;

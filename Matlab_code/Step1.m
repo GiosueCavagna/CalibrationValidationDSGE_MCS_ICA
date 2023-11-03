@@ -7,7 +7,6 @@ clean_dynare_files;
 % 1. Paramethers declaration
 %----------------------------------------------------------------
 %NK DSGE
-%{
 siggma = 1;
 varphi=5;
 phi_pi = 1.5;
@@ -21,24 +20,24 @@ eta  =3.77; %footnote 11, p. 115
 alppha=1/4;
 epsilon=9;
 tau=0; %//1/epsilon;
-%}
+
+
 %RBC DSGE
-
-
+%{
 alpha = 0.3;  
 beta  = 0.99;
 sigma = 1;
 delta = 0.025;
 rhoa = 0;
-
+%}
 
 %----------------------------------------------------------------
 % 2. Obtain model simulation
 %----------------------------------------------------------------
-params= [alpha,beta,sigma,delta,rhoa];
-%params = [alppha,betta,rho_a,rho_nu,rho_z,siggma,varphi,phi_pi,phi_y,eta,epsilon,theta,tau];
+%params= [alpha,beta,sigma,delta,rhoa];
+params = [alppha,betta,rho_a,rho_nu,rho_z,siggma,varphi,phi_pi,phi_y,eta,epsilon,theta,tau];
 periods=250;
-Simul_data(params,periods,true);
+Simul_data(params,periods,false);
 clear all
 Simul_data_0 = readtable('Simul_data.csv');
 
@@ -46,7 +45,7 @@ Simul_data_0 = readtable('Simul_data.csv');
 % 3. Rough Analysis of simulated data
 %----------------------------------------------------------------
 %NK DSGE
-%{
+
 %Y-8,Pi-3, N-5, W_real-2
 Simul_data = Simul_data_0(:,[8,3,5,2]);
 figure
@@ -67,9 +66,9 @@ nexttile
 plot(1:size(Simul_data,1),Simul_data.W_real);
 title('Real wage')
 grid on
-%}
 
 %RBC DSGE
+%{
 %C-1 k-2 a-3
 Simul_data = Simul_data_0;
 figure
@@ -83,7 +82,7 @@ title('capital')
 nexttile
 plot(1:size(Simul_data,1),Simul_data.a);
 title('tech')
-
+%}
 
 
 

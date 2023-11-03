@@ -149,6 +149,11 @@ model;
     log_A=log(A);
     [name='Definition log preference']
     log_Z=log(Z);
+
+    %Variable I want to observe
+    %Y_obs=Y;
+    %Pi_obs=P/P(-1);
+
 end;
 
 %----------------------------------------------------------------
@@ -195,18 +200,18 @@ steady;
 check;
 
 %----------------------------------------------------------------
-% 5. Monetary policy shock
+% 5a. Positive technological shock
 %---------------------------------------------------------------
 shocks;
-    var eps_nu = 0.0025^2; %//1 standard deviation shock of 25 basis points, i.e. 1 percentage point annualized
+    var eps_a = 0.001^2; 
 end;
 
 %----------------------------------------------------------------
-% 5. Monetary policy shock
+% 5b. Monetary policy shock
 %---------------------------------------------------------------
-shocks;
-    var eps_nu = 0.0025^2; %//1 standard deviation shock of 25 basis points, i.e. 1 percentage point annualized
-end;
+%shocks;
+%    var eps_nu = 0.0025^2; %//1 standard deviation shock of 25 basis points, i.e. 1 percentage point annualized
+%end;
 
 %stoch_simul(order = 1, nograph, nomoments, irf=16);
 

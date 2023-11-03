@@ -1,7 +1,7 @@
 %----------------------------------------------------------------
 % 1. Labeling
 %----------------------------------------------------------------
-var c k a;
+var n y c i k a;
 varexo ea;
 parameters alpha beta sigma delta rhoa;
 
@@ -21,8 +21,12 @@ set_param_value('rhoa',myparam(5));
 % 3. Model
 %----------------------------------------------------------------
 model;
-    c^(-sigma)=beta*c(+1)^(-sigma)*(alpha*exp(a(+1))*k^(alpha-1)+1-delta);
-    c+k=exp(a)*k(-1)^alpha+(1-delta)*k(-1); 
+    y=c+i;
+    y= a*k(-1)^alpha*n^(1-alpha)
+    n=((1-alpha)/(a*c^(sigma)))*y
+    k=i+(1-delta)*k(-1)
+    r=alpha*(y/k(-1))+(1-delta)
+    c^(-sigma)=beta*c(+1)^(-sigma)*r(+1);
     a = rhoa*a(-1)+ ea;    
 end;
 
@@ -42,6 +46,7 @@ initval; % initial guess for the steay state
     k= exp(log(0.5));
     c = exp(log(-exp(k)+exp(k)^alpha+(1-delta)*exp(k))); 
     a = 1;
+    
 end;
 
 steady;
@@ -58,13 +63,10 @@ steady;
 
 % solution with perturbation
 shocks;
-var ea; periods 3:5 6; values 0.01 0.005;
+var ea=1; %periods 3:5 6; values 0.01 0.005;
 end;
 
 @#include "util.txt" 
 
 stoch_simul(periods=@{T},noprint,nofunctions,nomoments,nocorr,irf=0);
 save("oo_");
-
-%stoch_simul(order = 2) c k;
-%stoch_simul(order = 2, pruning) c k;

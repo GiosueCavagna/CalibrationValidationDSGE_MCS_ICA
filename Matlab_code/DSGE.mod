@@ -149,6 +149,11 @@ model;
     log_A=log(A);
     [name='Definition log preference']
     log_Z=log(Z);
+
+    %Variable I want to observe
+    %Y_obs=Y;
+    %Pi_obs=P/P(-1);
+
 end;
 
 %----------------------------------------------------------------

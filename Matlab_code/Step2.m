@@ -43,12 +43,18 @@ Q1_1971=59;
 %Q1_2021=251;
 Q1_2019=243;
 
+Real_data = Real_data_0(Q1_1971:Q1_2019,:);
 
+
+
+
+%{
 %'PCECC96'-3,'GDPC1'-2,'CPIAUCSL'-121,'AWHMAN'-78,'AHETPIx'-132
-Real_data = Real_data_0(Q1_1971:Q1_2019,[3,2,121,78,132]);
-
+Real_data = Real_data_0(Q1_1971:Q1_2019,:);
+% I want to take Yr/Nr so that to have GDP per capita as in the model
 Cr=Real_data.PCECC96;
-Yr=Real_data.GDPC1;
+Yr=(Real_data.GDPC1/Real_data.%population);
+
 Pir=Real_data.CPIAUCSL;
 Nr=Real_data.AWHMAN;
 Wr=Real_data.AHETPIx;
@@ -115,4 +121,4 @@ seriesnames={'Consumption','Output','Inflation','Hour worked','Real wage'};
 VAR=varm(num_series,2);
 VAR.SeriesNames=seriesnames;
 [EstMdl,EstSE,logL,Tbl2] = estimate(VAR,Tbl1);
-
+%}
