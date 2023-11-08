@@ -1,5 +1,5 @@
 function Simul_data=Simul_data (params, periods, nmodel)
-
+%This function take as imput the parameters, the number of periods that have to be simulated and the name of the model that it is wanted to be simulated, and gives as output the dataset containing all the simulation of the endogenous variable.
 
 
 myparam= params;
@@ -30,6 +30,7 @@ delete oo_.mat
 writetable(Data, 'Simul_data_'+nmodel+'.csv');
 
 
-Simul_data = readtable('Simul_data.csv');
+%Simul_data = readtable(Simul_data_'+nmodel+'.csv');
+Simul_data=Data;
 
 end

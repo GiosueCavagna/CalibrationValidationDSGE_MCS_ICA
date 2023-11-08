@@ -43,10 +43,6 @@ rm(P1,P2);
 R=(1+Rdata$FEDFUNDS/100)^(1/4)
 #plot(Rdata$sasdate,R,type="l")
 
-#par(mfrow = c(3, 1))
-#plot(Rdata$sasdate,Y, type="l", main="Quarterly GDP per Capita" , xlab="")
-#plot(Rdata$sasdate,P, type="l", main="Quarterly Inflation", xlab="")
-#plot(Rdata$sasdate,R,type="l", main="Quarterly Nominal Interest Rate",xlab="Quarter")
 
 #-------------------------------------------------------------------------------
 #                                 SIMULATED DATA
@@ -59,6 +55,7 @@ SR=Sdata$R
 
 start_date=Rdata$sasdate[1]
 Sdata$date=seq(start_date, by = "quarter", length.out = length(Sdata$Y));
+
 #Inserting the trend in Y
 #lm=lm(Y~Rdata$sasdate)
 #trend=lm$coefficients[2]
