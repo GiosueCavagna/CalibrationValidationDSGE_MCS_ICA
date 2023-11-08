@@ -12,6 +12,8 @@
  * For a copy of the GNU General Public License,
  * see <http://www.gnu.org/licenses/>.
  */
+ 
+set_dynare_seed('clock');
 
 %----------------------------------------------------------------
 % 1. Defining variables
@@ -231,9 +233,9 @@ end;
 
 %stoch_simul(order = 1, nograph, nomoments, irf=16);
 
-
 %add by me
 @#include "util.txt" 
 
 stoch_simul(periods=@{T},order=3, noprint,nofunctions,nomoments,nocorr,irf=0);
+
 save("oo_");
