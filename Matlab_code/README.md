@@ -1,4 +1,4 @@
-#Simulation Part
+# Simulation Part
 The simulation part is all developed in Matlab and Dynare.
 
 Step1.m is the script that have to be run in order to obtain the simulation.
