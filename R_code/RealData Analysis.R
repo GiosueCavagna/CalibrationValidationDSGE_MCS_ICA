@@ -1,5 +1,6 @@
 library(lubridate)
 library(dplyr)
+library(R.matlab)
 rm(list=ls());
 
 #%slicing 1973:Q1 - 2021:Q1 (251, io uso 247 per evitare covid)
@@ -47,14 +48,34 @@ R=(1+Rdata$FEDFUNDS/100)^(1/4)
 #-------------------------------------------------------------------------------
 #                                 SIMULATED DATA
 #-------------------------------------------------------------------------------
-Sdata=read.csv("../Matlab_code/Simul_data_NK_NL_DSGE.csv")
 
-SY=Sdata$log_y
-SP=Sdata$Pi
-SR=Sdata$R
+Simul_logY=readMat("../Matlab_code/Simul_logY.mat")
+Simul_Pi=readMat("../Matlab_code/Simul_Pi.mat")
+Simul_R=readMat("../Matlab_code/Simul_R.mat")
 
-start_date=Rdata$sasdate[1]
-Sdata$date=seq(start_date, by = "quarter", length.out = length(Sdata$Y));
+t=length(Rdata$sasdate)
+i=4
+
+SY=Simul_logY$Simul.logY[(t*(i-1)+1):(t*i)];
+SP=Simul_Pi$Simul.Pi[(t*(i-1)+1):(t*i)];
+SR=Simul_R$Simul.R[(t*(i-1)+1):(t*i)];
+
+
+timespan=Rdata$sasdate;
+par(mfrow = c(2, 3))
+plot(timespan,Ydiff, type="l", main="Real GDP per Capita" , xlab="Quarter")
+plot(timespan,P, type="l", main="Real Inflation", xlab="Quarter")
+plot(timespan,R,type="l", main="Real Nominal Interest Rate",xlab="Quarter")
+
+plot(timespan,SY, type="l", main="Simulated GDP per Capita" , xlab="Quarter")
+plot(timespan,SP, type="l", main="Simulated Inflation", xlab="Quarter")
+plot(timespan,SR,type="l", main="Simulated Nominal Interest Rate",xlab="Quarter")
+
+
+
+
+#start_date=Rdata$sasdate[1]
+#Sdata$date=seq(start_date, by = "quarter", length.out = length(Sdata$Y));
 
 #Inserting the trend in Y
 #lm=lm(Y~Rdata$sasdate)
@@ -69,17 +90,5 @@ Sdata$date=seq(start_date, by = "quarter", length.out = length(Sdata$Y));
 #SY=SY+mu_z
 #plot(Rdata$sasdate,mu_z, type="l")
 #plot(Rdata$sasdate,SA, type="l")
-
-par(mfrow = c(2, 3))
-plot(Rdata$sasdate,Ydiff, type="l", main="Real GDP per Capita" , xlab="Quarter")
-plot(Rdata$sasdate,P, type="l", main="Real Inflation", xlab="Quarter")
-plot(Rdata$sasdate,R,type="l", main="Real Nominal Interest Rate",xlab="Quarter")
-
-plot(Sdata$date,SY, type="l", main="Simulated GDP per Capita" , xlab="Quarter")
-plot(Sdata$date,SP, type="l", main="Simulated Inflation", xlab="Quarter")
-plot(Sdata$date,SR,type="l", main="Simulated Nominal Interest Rate",xlab="Quarter")
-
-
-
 
 

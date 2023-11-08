@@ -320,6 +320,7 @@ M_.NNZDerivatives = [87; 120; 112; ];
 M_.static_tmp_nbr = [13; 3; 0; 0; ];
 M_.model_local_variables_static_tt_idxs = {
 };
+set_dynare_seed('clock');
 load myparam_values.mat
 set_param_value('alppha',myparam(1));
 set_param_value('betta',myparam(2));
