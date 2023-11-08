@@ -18,7 +18,7 @@ Rdata0=Rdata0[!is.na(Rdata0$sasdate),]
 
 Rdata=Rdata0;
 Rdata = Rdata %>% filter(sasdate >= Q1_1971 & sasdate <= Q1_2019)
-  
+
 
 N0=read.csv("CLF16OV.csv")
 N0$DATE=ymd(N0$DATE)
@@ -74,7 +74,7 @@ Sdata$date=seq(start_date, by = "quarter", length.out = length(Sdata$Y));
 #plot(Rdata$sasdate,SA, type="l")
 
 par(mfrow = c(2, 3))
-plot(Rdata$sasdate,Y, type="l", main="Real GDP per Capita" , xlab="Quarter")
+plot(Rdata$sasdate,Ydiff, type="l", main="Real GDP per Capita" , xlab="Quarter")
 plot(Rdata$sasdate,P, type="l", main="Real Inflation", xlab="Quarter")
 plot(Rdata$sasdate,R,type="l", main="Real Nominal Interest Rate",xlab="Quarter")
 
@@ -86,4 +86,3 @@ plot(Sdata$date,SR,type="l", main="Simulated Nominal Interest Rate",xlab="Quarte
 
 
 
-              
