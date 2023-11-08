@@ -1,4 +1,4 @@
-function Simul_data=Simul_data (params, periods, RBC)
+function Simul_data=Simul_data (params, periods, nmodel)
 
 
 
@@ -10,21 +10,11 @@ fid=fopen('util.txt','w+');
 fprintf(fid,'@#define T = %u\n',periods); 
 fclose(fid);
 
-if RBC==true
-    try
-        dynare RBC.mod ;
-    catch   
-       fprintf('Dynare ha dato un errore');
-    end
-    delete RBC.log
-else 
-    try
-        dynare DSGE.mod ;
-    catch   
-        fprintf('Dynare ha dato un errore');
-    end
-    delete DSGE.log
-end
+fid1=fopen('utill.m','w+');
+fprintf(fid1,'try\n    dynare '+nmodel+'.mod\ncatch\n    fprintf("Dynare ha dato un errore");\nend\n'+'delete '+nmodel+'.log'); 
+fclose(fid1);
+
+run('utill.m')
 
 load oo_.mat oo_
 Data=[oo_.endo_simul]';
@@ -32,14 +22,12 @@ VarNames=oo_.var_list;
 Data = array2table(Data, 'VariableNames', VarNames);
 
 % Use the writetable function to save the table as a CSV file
-
-
-
+delete utill.m
 delete util.txt
 delete myparam_values.mat
 delete oo_.mat
 
-writetable(Data, 'Simul_data.csv');
+writetable(Data, 'Simul_data_'+nmodel+'.csv');
 
 
 Simul_data = readtable('Simul_data.csv');
