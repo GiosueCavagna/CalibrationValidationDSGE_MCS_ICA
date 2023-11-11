@@ -62,6 +62,7 @@ SR=Simul_R$Simul.R[(t*(i-1)+1):(t*i)];
 
 
 timespan=Rdata$sasdate;
+
 par(mfrow = c(2, 3))
 plot(timespan,Ydiff, type="l", main="Real GDP per Capita" , xlab="Quarter")
 plot(timespan,P, type="l", main="Real Inflation", xlab="Quarter")
@@ -70,6 +71,7 @@ plot(timespan,R,type="l", main="Real Nominal Interest Rate",xlab="Quarter")
 plot(timespan,SY, type="l", main="Simulated GDP per Capita" , xlab="Quarter")
 plot(timespan,SP, type="l", main="Simulated Inflation", xlab="Quarter")
 plot(timespan,SR,type="l", main="Simulated Nominal Interest Rate",xlab="Quarter")
+
 
 
 
