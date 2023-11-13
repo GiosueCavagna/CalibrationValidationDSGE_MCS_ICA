@@ -54,13 +54,13 @@ Simul_Pi=readMat("../Matlab_code/Simul_Pi.mat")
 Simul_R=readMat("../Matlab_code/Simul_R.mat")
 
 t=length(Rdata$sasdate)
-i=4
-
-SY=Simul_logY$Simul.logY[(t*(i-1)+1):(t*i)];
-SP=Simul_Pi$Simul.Pi[(t*(i-1)+1):(t*i)];
-SR=Simul_R$Simul.R[(t*(i-1)+1):(t*i)];
-
-
+i=0;
+for (i in 1:(length(Simul_logY$Simul.logY)/t) ) {
+  SY=Simul_logY$Simul.logY[(t*(i-1)+1):(t*i)];
+  SP=Simul_Pi$Simul.Pi[(t*(i-1)+1):(t*i)];
+  SR=Simul_R$Simul.R[(t*(i-1)+1):(t*i)];
+  
+}
 timespan=Rdata$sasdate;
 
 par(mfrow = c(2, 3))

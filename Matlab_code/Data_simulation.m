@@ -49,21 +49,19 @@ fclose(fid);
 
 counter_e=0;
 for i=1:n_CoP
-            %definition of parameters
+    %definition of parameters
         
-        if i+j==2  
-            h='è qui'
-            params_t=params;
-        else
-            params_t= [q(i+1,1:11),tau,eta];
-            params_t(6)= params_t(6)+0.5; %limitation siggma
-            params_t(7)= (params_t(7)*9)+0.5; %limitation varphi
-            params_t(8)=  params_t(8)*5; %limiation phi_pi
-            params_t(11)=  (params_t(11)*10)+5; %limitation epsilon
-        end
-    for j=1:n_MC
-i,j
+    if i==1
+        params_t=params;
+    else
+        params_t= [q(i+1,1:11),tau,eta];
+        params_t(6)= params_t(6)+0.5; %limitation siggma
+        params_t(7)= (params_t(7)*9)+0.5; %limitation varphi
+        params_t(8)=  params_t(8)*5; %limiation phi_pi
+        params_t(11)=  (params_t(11)*10)+5; %limitation epsilon
+    end
 
+    for j=1:n_MC
         %Data Simulation
         save myparam_values.mat params_t;
 
@@ -80,7 +78,7 @@ i,j
             Dd=NaN(periods,length(VarNames));
             Simul_data_t= array2table(Dd, 'VariableNames', VarNames);
             error=0;
-            counter_e=counter_e+1
+            counter_e=counter_e+1;
         else
             load oo_.mat oo_
             Dd=[oo_.endo_simul]';
@@ -89,9 +87,9 @@ i,j
   
         end
 
-        Simul_logY(:,i,j)=table2array(Simul_data_t(:,'log_y'));
-        Simul_Pi(:,i,j)=table2array(Simul_data_t(:,'Pi'));
-        Simul_R(:,i,j)=table2array(Simul_data_t(:,'R'));
+        Simul_logY(:,j,i)=table2array(Simul_data_t(:,'log_y'));
+        Simul_Pi(:,j,i)=table2array(Simul_data_t(:,'Pi'));
+        Simul_R(:,j,i)=table2array(Simul_data_t(:,'R'));
     end    
 end 
 
