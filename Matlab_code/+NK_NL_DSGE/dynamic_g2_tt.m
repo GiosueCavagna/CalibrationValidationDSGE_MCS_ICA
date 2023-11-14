@@ -42,13 +42,13 @@ T(68) = T(14)*T(14)*(-(y(7)*T(67)))-(-(y(7)*T(41)))*(T(14)*T(41)+T(14)*T(41));
 T(69) = T(14)*T(14)*T(14)*T(14);
 T(70) = y(16)*(-(1-params(1)))/(y(10)*y(10));
 T(71) = T(14)*T(47)+T(14)*T(47);
-T(72) = params(12)*getPowerDeriv(y(8),T(16),2);
+T(72) = params(11)*getPowerDeriv(y(8),T(16),2);
 T(73) = getPowerDeriv(y(6),(-params(6)),2);
 T(74) = y(15)*T(73);
 T(75) = y(13)*T(74);
-T(76) = params(2)*params(12)*getPowerDeriv(y(35),T(22),2);
-T(77) = params(2)*params(12)*getPowerDeriv(y(35),params(11)-1,2);
-T(78) = getPowerDeriv(y(11),params(10),2);
+T(76) = params(2)*params(11)*getPowerDeriv(y(35),T(22),2);
+T(77) = params(2)*params(11)*getPowerDeriv(y(35),params(10)-1,2);
+T(78) = getPowerDeriv(y(11),params(13),2);
 T(79) = (-(y(13)*T(78)));
 
 end

@@ -18,7 +18,7 @@ assert(length(T) >= 16);
 T = NK_NL_DSGE.static_resid_tt(T, y, x, params);
 
 T(14) = y(8)*y(10)*getPowerDeriv(y(1),(-params(6)),1);
-T(15) = getPowerDeriv(y(3),params(11)-1,1);
+T(15) = getPowerDeriv(y(3),params(10)-1,1);
 T(16) = getPowerDeriv(y(5)/y(11),1-params(1),1);
 
 end

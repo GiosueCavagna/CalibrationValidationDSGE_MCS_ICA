@@ -21,12 +21,12 @@ T(3) = (y(5)/y(11))^(1-params(1));
 T(4) = 1/params(2)*y(3)^params(8);
 T(5) = (y(8)/(y(8)))^params(9);
 T(6) = y(11)*y(8)*(1-params(1))/y(5);
-T(7) = y(3)^(params(11)-1);
-T(8) = params(12)*y(3)^(params(11)/(1-params(1)));
+T(7) = y(3)^(params(10)-1);
+T(8) = params(11)*y(3)^(params(10)/(1-params(1)));
 T(9) = y(1)^(-params(6));
 T(10) = y(10)*T(9);
 T(11) = y(8)*T(10);
-T(12) = params(2)*params(12)*y(3)^(params(11)+params(1)*params(11)/(1-params(1)));
-T(13) = y(6)^params(10);
+T(12) = params(2)*params(11)*y(3)^(params(10)+params(1)*params(10)/(1-params(1)));
+T(13) = y(6)^params(13);
 
 end

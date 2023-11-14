@@ -59,7 +59,6 @@ for (i in 1:(length(Simul_logY$Simul.logY)/t) ) {
   SY=Simul_logY$Simul.logY[(t*(i-1)+1):(t*i)];
   SP=Simul_Pi$Simul.Pi[(t*(i-1)+1):(t*i)];
   SR=Simul_R$Simul.R[(t*(i-1)+1):(t*i)];
-  
 }
 timespan=Rdata$sasdate;
 

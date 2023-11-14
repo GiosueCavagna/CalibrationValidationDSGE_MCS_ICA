@@ -34,16 +34,16 @@ T(11) = y(13)/(steady_state(8));
 T(12) = T(11)^params(9);
 T(13) = y(13)*(1-params(1))/y(10);
 T(14) = y(16)*T(13);
-T(15) = (-params(11))/(1-params(1));
-T(16) = params(11)/(1-params(1));
-T(17) = params(12)*y(8)^T(16);
-T(18) = 1+params(11)*params(1)/(1-params(1));
+T(15) = (-params(10))/(1-params(1));
+T(16) = params(10)/(1-params(1));
+T(17) = params(11)*y(8)^T(16);
+T(18) = 1+params(10)*params(1)/(1-params(1));
 T(19) = y(6)^(-params(6));
 T(20) = y(15)*T(19);
 T(21) = y(13)*T(20);
-T(22) = params(11)+params(1)*params(11)/(1-params(1));
-T(23) = params(2)*params(12)*y(35)^T(22);
-T(24) = params(2)*params(12)*y(35)^(params(11)-1);
-T(25) = y(11)^params(10);
+T(22) = params(10)+params(1)*params(10)/(1-params(1));
+T(23) = params(2)*params(11)*y(35)^T(22);
+T(24) = params(2)*params(11)*y(35)^(params(10)-1);
+T(25) = y(11)^params(13);
 
 end

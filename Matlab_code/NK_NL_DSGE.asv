@@ -65,10 +65,10 @@ parameters
     varphi              ${\varphi}$     (long_name='inverse Frisch elasticity')
     phi_pi              ${\phi_{\pi}}$  (long_name='inflation feedback Taylor Rule')
     phi_y               ${\phi_{y}}$    (long_name='output feedback Taylor Rule')
+    eta                 ${\eta}$        (long_name='semi-elasticity of money demand')
     epsilon             ${\epsilon}$    (long_name='demand elasticity')
     theta               ${\theta}$      (long_name='Calvo parameter')
     tau                 ${\tau}$      (long_name='labor subsidy')
-    eta                 ${\eta}$        (long_name='semi-elasticity of money demand')
     ;
 
 %----------------------------------------------------------------
