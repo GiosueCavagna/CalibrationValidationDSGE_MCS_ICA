@@ -1,0 +1,62 @@
+#Stuff I choose to don't upload#
+##################################
+#file class#
+############
+*.mat
+*.asv
+*.Rdata
+*.cvs
+
+#specific folder#
+#################
+#MATALAB_CODE
+Matlab_code/+NK_DSGE
+Matlab_code/NK_DSGE
+Matlab_code/+NK_NL_DSGE
+Matlab_code/NK_NL_DSGE
+Matlab_code/+RBC
+Matlab_code/RBC
+Matlab_code/Simulated_Data
+#RSTUDIO_CODE
+R_code/Data
+#OTHERS FILE
+Instruction.txt
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.env
