@@ -10,6 +10,7 @@
 #specific folder#
 #################
 #MATALAB_CODE
+############
 Matlab_code/+NK_DSGE
 Matlab_code/NK_DSGE
 Matlab_code/+NK_NL_DSGE
@@ -18,9 +19,13 @@ Matlab_code/+RBC
 Matlab_code/RBC
 Matlab_code/Simulated_Data
 #RSTUDIO_CODE
+############
 R_code/Data
 #OTHERS FILE
+############
 Instruction.txt
+Matlab_code/NK_DSGE.mod
+Matlab_code/RBC.mod
 
 # Compiled source #
 ###################
