@@ -1,0 +1,26 @@
+Dynare++ v. 5.4
+
+Copyright © 2004-2011 Ondra Kamenik
+Copyright © 2019-2020 Dynare Team
+Dynare++ comes with ABSOLUTELY NO WARRANTY and is distributed under the GNU GPL,
+version 3 or later (see https://www.gnu.org/licenses/gpl.html)
+
+
+System info: Darwin 22.6.0 Darwin Kernel Version 22.6.0: Wed Jul  5 22:22:05 PDT 2023; root:xnu-8796.141.3~6/RELEASE_ARM64_T6000 x86_64, processors online: 8
+
+Start time: 2023-12-05 16:00:22 +0100
+
+  ┌────╼ elapsed time (seconds)                     
+  │       ┌────╼ record unique identifier           
+  │       │     ┌────╼ load average                 
+  │       │     │    ┌────╼ available memory (MB)   
+  │       │     │    │     ┌─────╼ major faults (MB)
+  │       │     │    │     │                        
+  ╽       ╽     ╽    ╽     ╽                        
+327.351│S00000│9.3│642.4│      │ Non-linear solver for deterministic steady state skipped
+327.351│E00000│9.3│642.4│0.0000│ Non-linear solver for deterministic steady state skipped
+327.359│S00001│9.3│642.4│      │ Recovering first order derivatives 
+327.360│M00002│9.3│642.4│      │   Blanchard-Kahn conditition satisfied, model stable
+327.360│E00001│9.3│642.4│0.0000│ Recovering first order derivatives 
+327.360│M00003│9.3│642.4│      │ Error of current approximation for shocks at sigma 0.000000 is 0.000000
+327.360│M00004│9.3│642.4│      │ Error of current approximation for full shocks is 0.000000

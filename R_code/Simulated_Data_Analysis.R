@@ -1,10 +1,15 @@
 library(R.matlab)
+library(devtools)
+install_github("STieleman/svarCAL")
+library(svarCAL)
+
+
 
 #-------------------------------------------------------------------------------
 #                                 SIMULATED DATA
 #-------------------------------------------------------------------------------
 
-Simul_logY=readMat("Data/Simul_logY.mat")
+Simul_logY=readMat("../Matlab_code/Simul/Simul_logY.mat")
 Simul_Pi=readMat("Data/Simul_Pi.mat")
 Simul_R=readMat("Data/Simul_R.mat")
 

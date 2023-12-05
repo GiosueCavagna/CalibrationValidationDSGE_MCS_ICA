@@ -5,13 +5,15 @@ library(fastICA)
 library(clue)
 library(steadyICA)
 library(data.table)
+library(R.matlab)
+library(devtools)
+install_github("STieleman/svarCAL")
+library(svarCAL)
 
 rm(list=ls());
 
 
 #REAL DATA-----
-
-
 #-Data import and arrangement----
 
 Rdata0=read.csv("2023-09.csv")
@@ -71,56 +73,67 @@ A_rw = fAp_fastICA(ures,sseed=46) # rw mixing matrix
 
 #SIMULATED DATA----
 source(paste("frobICA_mod.R", sep=""))
-refM <- A_rw
-#-Data import----
-Simul_logY=readMat("Data/Simul_logY.mat") #readMat("Simul_logY.mat")
-Simul_Pi=readMat("Data/Simul_Pi.mat") #readMat("Simul_PI.mat")
-Simul_R=readMat("Data/Simul_R.mat") #readMat("Simul_R.mat")
+refM = A_rw
 
-Simul.logY=lapply(Simul_logY$Simul.logY, na.omit)
-Simul.Pi=na.omit(Simul_Pi$Simul.Pi)
-Simul.R=na.omit(Simul_R$Simul.R)
-
-Simul.R[2,1,10]
-#load(".../A_rw.Rdata") 
-refM <- A_rw
-
-tau= 193 #200 # simulation length
-nmr= 2 #500 # number of Monte Carlo runs
-ncp= 2 #500 # number of configuration of parameters
-#t <- length(106:tau) # time steps (without transient)
-#wheredata<-'' # insert path containing the simulated data
+tau= 200 #200 # simulation length
+nmr= 500 #500 # number of Monte Carlo runs
+ncp= 500 #500 # number of configuration of parameters
 k <- nrow(refM) # number of variables
+
+#-Data import----
+Simul_logY=readMat("Data/Simul_logY.mat") #readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_logY.mat") #
+Simul_Pi=readMat("Data/Simul_PI.mat") #readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_Pi.mat") #
+Simul_R=readMat("Data/Simul_R.mat") #readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_R.mat") 
+#[tau,nmr,ncp]
 
 #-Creation of simulation dataset----
 D = list()
-for(i in 1:ncp){
-  D[[i]] = list()
-  D[[i]]$list = list()
-  for (j in 1:nmr){
-    D[[i]]$list[[j]] = as.data.frame(cbind(Simul_logY$Simul.logY[,j,i],Simul_Pi$Simul.Pi[,j,i],Simul_R$Simul.R[,j,i]))
-    colnames(D[[i]]$list[[j]]) = c('log_Y','Pi','R')
+i=1
+Error=matrix(0,3,ncp);
+for(ii in 1:ncp){
+  Error[c(1,2),ii]=c(ii,"Rank Not or Div");
+  #Check if the CoP return Nan simulation
+  if (!(is.nan(Simul_logY$Simul.logY[1,1,ii])| is.nan(Simul_logY$Simul.logY[200,500,ii]) | abs(Simul_logY$Simul.logY[200,500,ii])>10e+2 | abs(Simul_logY$Simul.logY[200,500,ii])<10e-14)){ #Check if the CoP return divergent simulation 
+    D[[i]] = list()
+    D[[i]]$list = list()
+    for (j in 1:nmr){
+      D[[i]]$list[[j]] = as.data.frame(cbind(Simul_logY$Simul.logY[,j,ii],Simul_Pi$Simul.Pi[,j,ii],Simul_R$Simul.R[,j,ii]))
+      colnames(D[[i]]$list[[j]]) = c('log_Y','Pi','R')
+    }
+    Error[,ii]=c(ii,"No",i);
+    i=i+1
   }
-  print(i)
+  print(ii)
 }
-
-D = na.omit(D)
+sum(Error[2,]!="No")
+ncp_n=i-1
 #-Estimation procedure----
-Mres = as.list(1:ncp)
-for(i in 1:ncp) {
+Mres = as.list(1:ncp_n)
+i=14
+for(i in 1:ncp_n) {
   Mres[[i]] <- list()
   Mres[[i]]$m_ica <- as.list(1:nmr) # it delivers a mixing matrix for each monte carlo run
   Mres[[i]]$f_dist <- rep(NA,nmr)
   Mres[[i]]$ica_perm <- as.list(1:nmr)
   
   #estimate VARs
-  m_VAR <- lapply(D[[i]][[1]],VAR,p=2) # var of model data
+  m_VAR <- tryCatch(
+           { lapply(D[[i]][[1]],VAR,p=la)},# mixing matrices of model data
+            error = function(e) {
+            m_VAR #In case of problem I put the previous 
+           }
+           )#lag) # var of model data
   m_res <- lapply(m_VAR,residuals) # residuals of model data
   #VAR coefficients
   AA <- lapply(m_VAR,coef)
   
   #estimate mixing matrix using fastICA
-  Mres[[i]]$m_ica <- lapply(m_res,fAp_fastICA,sseed=46) # mixing matrices of model data
+  Mres[[i]]$m_ica <-  tryCatch(
+                      { lapply(m_res,fAp_fastICA,sseed=46)},# mixing matrices of model data
+                      error = function(e) {
+                        Mres[[i-1]]$m_ica #In case of problem I put the previous 
+                      }
+                      )
   mt_ica <- lapply(Mres[[i]]$m_ica,t)
   fb <- lapply(mt_ica,frobICA_mod,refM)
   perm <- list()
@@ -131,9 +144,12 @@ for(i in 1:ncp) {
   Mres[[i]]$ica_perm <- Map(function(x, y)x%*%y,Mres[[i]]$m_ica,perm)
   print(i)
 }
+counter=length(Mres)
+Mres=unique(Mres) #I remove the problematic term
+countICA=426-375#counter-length(Mres)
 
-fb_dist <- matrix(0,ncp,nmr)
-for (i in 1:ncp) {
+fb_dist <- matrix(0,ncp_n-countICA,nmr)
+for (i in 1:(ncp_n-countICA)) {
   fb_dist[i,] <- Mres[[i]]$f_dist # MDI for each CoPs and MC runs
 }
 
@@ -144,8 +160,59 @@ save(Mres,file="Mres.Rdata") # change path
 M_dist=fb_dist
 
 iMC =500# 200
-iCoP =500# 200
+iCoP =ncp_n-countICA# 200
 
+#load ("~/Documents/CalibrationValidationDSGE_MCS_ICA/R_code/M_dist.Rdata")
+
+vMean.val <- apply(M_dist,1,fnMean)
+vVar.val <- apply(M_dist,1,fnVar)
+mVal <- cbind(1:iCoP,vMean.val,vVar.val)
+mVal <- mVal[order(mVal[,2],decreasing=T),]
+
+vIndex <- 1:iCoP
+dA <- 1
+iN <- iMC
+
+mPValue.val <- fnMCS(vMean.val,vVar.val,vIndex,dA,verbose=0)
+# mPValue.val <- mPValue.val[order(mPValue.val[,2],increasing=T),]
+mPValue.val <- cbind(mPValue.val,mVal[,2:3])
+vCoP.pass <- mPValue.val[which(mPValue.val[,2]>0.05)]
+
+setwd("...") # change path
+
+MCS <- paste("MCS_calib.csv",sep=",")
+write.csv(mPValue.val,MCS,col.names=T)
+
+#Function----
+fAp_fastICA<-function(ures, sseed=46){
+  set.seed(sseed)
+  n<-ncol(ures)
+  X<-t(ures)
+  #jb.info= c(jarque.test(ures[,1])$p.value,jarque.test(ures[,2])$p.value,jarque.test(ures[,3])$p.value)
+  icares <- fastICA(t(X), nrow(X),tol=1e-14, maxit=3000, verbose=FALSE) #Doris: tol=1e-14
+  set.seed(NULL)
+  K=icares$K
+  W <- t((icares$K) %*% (icares$W)) 
+  A <-solve(W) # A is the mixing matrix
+  # A <- ginv(W)
+  eres<- t(W %*% X) # 
+  aba<-abs(A)
+  CC<-matrix(0,n,2)
+  for(i in 1:n){
+    cc<-which(aba == max(aba), arr.ind = TRUE) # coordinate of the matrix where is the max entry
+    aba[cc[1],]<-0
+    aba[,cc[2]]<-0
+    CC[i,]<-cc
+  }
+  sn<-1:n
+  for(i in 1:n){sn[i]<-CC[CC[,1]==i,2]}
+  Ap<-A[,sn]
+  cnames<-paste("s", 1:n, sep="")
+  colnames(Ap) <-cnames
+  #if(Ap[1,1]>0){Ap[,1]<- -Ap[,1]}
+  for (i in 1:n){if(Ap[i,i]<0){Ap[,i]<- -Ap[,i]}}
+  Ap
+}
 ## Function mean
 
 fnMean <- function(x) {
@@ -217,53 +284,5 @@ fnMCS <- function(vMean,vVar,vIndex,dA,verbose=1) {
   return(mPValue)
 }
 
-vMean.val <- apply(M_dist,1,fnMean)
-vVar.val <- apply(M_dist,1,fnVar)
-mVal <- cbind(1:200,vMean.val,vVar.val)
-mVal <- mVal[order(mVal[,2],decreasing=T),]
-
-vIndex <- 1:iCoP
-dA <- 1
-iN <- iMC
-
-mPValue.val <- fnMCS(vMean.val,vVar.val,vIndex,dA,verbose=0)
-# mPValue.val <- mPValue.val[order(mPValue.val[,2],increasing=T),]
-mPValue.val <- cbind(mPValue.val,mVal[,2:3])
-vCoP.pass <- mPValue.val[which(mPValue.val[,2]>0.05)]
-
-setwd("...") # change path
-
-MCS <- paste("MCS_calib.csv",sep=",")
-write.csv(mPValue.val,MCS,col.names=T)
-
-#Function----
-fAp_fastICA<-function(ures, sseed=46){
-  set.seed(sseed)
-  n<-ncol(ures)
-  X<-t(ures)
-  icares <- fastICA(t(X), nrow(X),tol=1e-14, maxit=3000, verbose=FALSE) #Doris: tol=1e-14
-  set.seed(NULL)
-  K=icares$K
-  W <- t((icares$K) %*% (icares$W)) 
-  A <-solve(W) # A is the mixing matrix
-  # A <- ginv(W)
-  eres<- t(W %*% X) # 
-  aba<-abs(A)
-  CC<-matrix(0,n,2)
-  for(i in 1:n){
-    cc<-which(aba == max(aba), arr.ind = TRUE) # coordinate of the matrix where is the max entry
-    aba[cc[1],]<-0
-    aba[,cc[2]]<-0
-    CC[i,]<-cc
-  }
-  sn<-1:n
-  for(i in 1:n){sn[i]<-CC[CC[,1]==i,2]}
-  Ap<-A[,sn]
-  cnames<-paste("s", 1:n, sep="")
-  colnames(Ap) <-cnames
-  #if(Ap[1,1]>0){Ap[,1]<- -Ap[,1]}
-  for (i in 1:n){if(Ap[i,i]<0){Ap[,i]<- -Ap[,i]}}
-  Ap
-}
 
 
