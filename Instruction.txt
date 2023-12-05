@@ -1,7 +1,0 @@
-In order to charge new file in the GitHUB repository:
-  git add "new_file_name"
-  git commit -m "message related to add new file"
-  git push origin
-
-In order to update the local repository 
-	git pull origin
