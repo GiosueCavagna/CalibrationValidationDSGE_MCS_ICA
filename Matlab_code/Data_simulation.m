@@ -1,4 +1,4 @@
-function [c_e1,c_e2,q]=Data_simulation(n_MC,n_CoP,periods)
+function [CoP_store]=Data_simulation(n_MC,n_CoP,periods)
 %This function take as input the number of MC simulation, the number of Cop and the number of periods. It return the Simulation dataset of log_Y, Pi and R.
     %clear all
     clean_dynare_files;
@@ -54,8 +54,11 @@ function [c_e1,c_e2,q]=Data_simulation(n_MC,n_CoP,periods)
     fclose(fid);
     
     %inizialization counter
-    c_e1=0; %other error
-    c_e2=0; %rank condition not verified
+    %c_e1=0; %other error
+    %c_e2=0; %rank condition not verified
+
+    %Inizialization store_CoP
+    CoP_store=zeros(n_CoP,13);
 
     %Main loop simulation
     for i=1:n_CoP
@@ -87,18 +90,17 @@ function [c_e1,c_e2,q]=Data_simulation(n_MC,n_CoP,periods)
                 error=1;
             end
     
-            if error==1 %If dynare gives an error due to a weird CoP then NaN is saved in the dataset
-                Dd=NaN(periods,length(VarNames));
+            if error==1 %If dynare gives an error due to a weird CoP then Zeros is saved in the dataset
+                Dd=zeros(periods,length(VarNames));
                 Simul_data_t= array2table(Dd, 'VariableNames', VarNames);
-                error=0;
-                c_e1=c_e1+1;
+                %c_e1=c_e1+1;
             else
                 load oo_.mat oo_
                 Dd=[oo_.endo_simul]';
                 if isempty (Dd)
-                    c_e2=c_e2+1;
+                    %c_e2=c_e2+1;
 
-                    Dd=NaN(periods,length(VarNames));
+                    Dd=zeros(periods,length(VarNames));
                     Simul_data_t= array2table(Dd, 'VariableNames', VarNames);
                     for k=1:n_MC
                         Simul_logY(:,k,i)=table2array(Simul_data_t(:,'log_y'));
@@ -114,7 +116,8 @@ function [c_e1,c_e2,q]=Data_simulation(n_MC,n_CoP,periods)
             Simul_logY(:,j,i)=table2array(Simul_data_t(:,'log_y'));
             Simul_Pi(:,j,i)=table2array(Simul_data_t(:,'Pi'));
             Simul_R(:,j,i)=table2array(Simul_data_t(:,'R'));
-        end    
+        end  
+        CoP_store(i,:)=params_t;
     end 
 
         
