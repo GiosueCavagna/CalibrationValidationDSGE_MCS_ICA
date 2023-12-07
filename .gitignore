@@ -18,16 +18,17 @@ Matlab_code/NK_NL_DSGE
 Matlab_code/+RBC
 Matlab_code/RBC
 Matlab_code/Simulated_Data
+Matlab_code/NK_DSGE.mod
+Matlab_code/RBC.mod
 #RSTUDIO_CODE
 ############
 R_code/Data
+R_code/MCS_calib.csv
+R_code/Old_Code
 #OTHERS FILE
 ############
 ############
-R_code/MCS_calib.csv
 Instruction.txt
-Matlab_code/NK_DSGE.mod
-Matlab_code/RBC.mod
 
 # Compiled source #
 ###################
