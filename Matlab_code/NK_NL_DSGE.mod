@@ -218,9 +218,9 @@ check;
 % 5a. Positive technological shock
 %---------------------------------------------------------------
 shocks;
-    var eps_a  = 0.01^2; //unit shock to technology
-    %var eps_nu = 0.0025^2; %//1 standard deviation shock of 25 basis points, i.e. 1 percentage point annualized
-    %var eps_z = 0.001^2; 
+    var eps_a  = 0.001^2; //unit shock to technology
+    var eps_nu = 0.0025^2; %//1 standard deviation shock of 25 basis points, i.e. 1 percentage point annualized
+    var eps_z = 0.001^2; 
 
 end;
 

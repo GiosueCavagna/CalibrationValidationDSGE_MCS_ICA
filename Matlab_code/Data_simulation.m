@@ -103,8 +103,8 @@ function [CoP_store]=Data_simulation(n_MC,n_CoP,periods)
                     Dd=zeros(periods,length(VarNames));
                     Simul_data_t= array2table(Dd, 'VariableNames', VarNames);
                     for k=1:n_MC
-                        Simul_logY(:,k,i)=table2array(Simul_data_t(:,'log_y'));
-                        Simul_Pi(:,k,i)=table2array(Simul_data_t(:,'Pi'));
+                        Simul_Y(:,k,i)=table2array(Simul_data_t(:,'Y'));
+                        Simul_Pi(:,k,i)=table2array(Simul_data_t(:,'P'));
                         Simul_R(:,k,i)=table2array(Simul_data_t(:,'R'));
                     end
                     break;
@@ -113,8 +113,10 @@ function [CoP_store]=Data_simulation(n_MC,n_CoP,periods)
                 delete oo_.mat
             end
     
-            Simul_logY(:,j,i)=table2array(Simul_data_t(:,'log_y'));
-            Simul_Pi(:,j,i)=table2array(Simul_data_t(:,'Pi'));
+            %Simul_logY(:,j,i)=table2array(Simul_data_t(:,'log_y'));
+            Simul_Y(:,j,i)=table2array(Simul_data_t(:,'Y'));
+            %Simul_Pi(:,j,i)=table2array(Simul_data_t(:,'Pi'));
+            Simul_P(:,j,i)=table2array(Simul_data_t(:,'P'));
             Simul_R(:,j,i)=table2array(Simul_data_t(:,'R'));
         end  
         CoP_store(i,:)=params_t;
@@ -123,12 +125,14 @@ function [CoP_store]=Data_simulation(n_MC,n_CoP,periods)
         
     %it is remove the useless file created during the MC
     delete NK_NL_DSGE.log
+    %delete NK_NL_DSGE.jnl
     delete util.txt
     delete myparam_values.mat
         
     %it is saved the results of the simulation 
-    save Simulated_Data/Simul_logY.mat Simul_logY
-    save Simulated_Data/Simul_Pi.mat Simul_Pi
+    %save Simulated_Data/Simul_logY.mat Simul_logY
+    save Simulated_Data/Simul_Y.mat Simul_Y
+    save Simulated_Data/Simul_P.mat Simul_P
     save Simulated_Data/Simul_R.mat Simul_R
 
     

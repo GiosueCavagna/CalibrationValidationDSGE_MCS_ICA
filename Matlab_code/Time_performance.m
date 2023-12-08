@@ -1,7 +1,7 @@
 clear all
-n_MC=10;
-n_CoP=10;
-periods=200;
+n_MC=500;
+n_CoP=500;
+periods=300;
 tic
 [CoP_store]=Data_simulation(n_MC,n_CoP,periods);
 info_simul=[n_MC,n_CoP, periods];
