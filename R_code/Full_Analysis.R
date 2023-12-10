@@ -139,15 +139,15 @@ fnVar <- function(x) {
 }
 
 #Function to compute the test statistics of the CoP
-fnTest <- function(vMean,vVar,iN,dA=1) {
+fnTest <- function(vMean,vVar,nmr,dA=1) {
   iM <- length(vMean)
   if (iM>2) {
     mA <- cbind(rep(1,iM-1),diag(-rep(1,iM-1)))
     mVar <- diag(vVar[-1])
     mVar2 <- mVar+vVar[1]
-    dTest <- drop(iN*t(mA%*%vMean)%*%solve(mVar2)%*%(mA%*%vMean))
+    dTest <- drop(nmr*t(mA%*%vMean)%*%solve(mVar2)%*%(mA%*%vMean))
   } else {
-    dTest <- iN*(vMean[1]-vMean[2])^2/(vVar[1]+vVar[2])
+    dTest <- nmr*(vMean[1]-vMean[2])^2/(vVar[1]+vVar[2])
   }
   if (iM>1) {
     dQuan <- qchisq(1-dA,iM-1)
@@ -171,9 +171,9 @@ fnElim	<- function(vMean,vVar,vIndex) {
 fnMCS <- function(vMean,vVar,vIndex,dA,verbose=1) {
   iI <- length(vIndex)
   iStop <- fnTest(vMean,vVar,dA)$result
-  mPValue <- matrix(0,ncol=2,nrow=iCoP)
+  mPValue <- matrix(0,ncol=2,nrow=ncp)
   for (i in 1:iI) {
-    lTest <- fnTest(vMean,vVar,iN,dA)
+    lTest <- fnTest(vMean,vVar,nmr,dA)
     iStop <- lTest$result
     if (iStop!=1) break
     lElim <- fnElim(vMean,vVar,vIndex)
@@ -185,7 +185,7 @@ fnMCS <- function(vMean,vVar,vIndex,dA,verbose=1) {
     mPValue[i,] <- c(lElim$elim,lTest$p)
   }
   if (i==iI) {
-    mPValue[iI,1] <- setdiff(vIndex,mPValue[1:(iCoP-1),1])
+    mPValue[iI,1] <- setdiff(vIndex,mPValue[1:(ncp-1),1])
     mPValue[iI,2] <- 1
   } else {
     mPValue <- mPValue[1:(i-1),]
@@ -285,7 +285,6 @@ refM = A_rw
 rm(list=setdiff(ls(), c("n_periods","refM","lag","lm_Y","lm_P","frobICA_mod","fAp_fastICA","fnMean","fnVar","fnTest","fnElim","fnMCS","ratesfnLev")))
 
 #SIMULATED DATA----
-#-Data import----
 CoP_store=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/CoP_store.mat") 
 info_simul=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/info_simul.mat")
 
@@ -428,12 +427,13 @@ for (i in 1:n_pass){
 CoP_colnames=c("alppha","betta","rho_a","rho_nu","rho_z","siggma","varphi","phi_pi","phi_y","epsilon","theta","tau","eta")
 CoP_pass = data.frame(CoP_pass)
 colnames(CoP_pass) = CoP_colnames
+CoP_pass=t(CoP_pass)
 
 #Computation percentage of discarded CoP due to error
 err_perc=(info_simul$info.simul[2]-ncp)/info_simul$info.simul[2]
 
 
-rm(list=setdiff(ls(), c("CoP_pass","mPValue.val","lag","refM","CoP_store", "CoP_err","err_perc")))
+#rm(list=setdiff(ls(), c("CoP_pass","mPValue.val","lag","refM","CoP_store", "CoP_err","err_perc")))
 
 #MCS <- paste("MCS_calib.csv",sep=",")
 #write.csv(mPValue.val,MCS,col.names=T)
