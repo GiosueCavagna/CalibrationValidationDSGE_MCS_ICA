@@ -1,4 +1,4 @@
-function [CoP_store]=Data_simulation(n_MC,n_CoP,periods)
+function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
 %This function take as input the number of MC simulation, the number of Cop and the number of periods. It return the Simulation dataset of log_Y, Pi and R.
     %clear all
     clean_dynare_files;
@@ -131,9 +131,9 @@ function [CoP_store]=Data_simulation(n_MC,n_CoP,periods)
         
     %it is saved the results of the simulation 
     %save Simulated_Data/Simul_logY.mat Simul_logY
-    save Simulated_Data/Simul_Y.mat Simul_Y
-    save Simulated_Data/Simul_P.mat Simul_P
-    save Simulated_Data/Simul_R.mat Simul_R
+    save Simulated_Data/Simul_Y2.mat Simul_Y
+    save Simulated_Data/Simul_P2.mat Simul_P
+    save Simulated_Data/Simul_R2.mat Simul_R
 
     
     

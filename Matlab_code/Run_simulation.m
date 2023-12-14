@@ -1,12 +1,12 @@
 clear all
-n_MC=500;
-n_CoP=500;
+n_MC=200;
+n_CoP=1250;
 periods=300;
 tic
-[CoP_store]=Data_simulation(n_MC,n_CoP,periods);
+[CoP_store]=fn_data_simulation(n_MC,n_CoP,periods);
 info_simul=[n_MC,n_CoP, periods];
-save Simulated_Data/info_simul.mat  info_simul
-save Simulated_Data/CoP_store.mat  CoP_store
+save Simulated_Data/info_simul2.mat  info_simul
+save Simulated_Data/CoP_store2.mat  CoP_store
 toc
 
 %time_for_simulation =1.210449
