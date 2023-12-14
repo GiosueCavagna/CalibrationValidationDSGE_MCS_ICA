@@ -285,8 +285,8 @@ refM = A_rw
 rm(list=setdiff(ls(), c("n_periods","refM","lag","lm_Y","lm_P","frobICA_mod","fAp_fastICA","fnMean","fnVar","fnTest","fnElim","fnMCS","ratesfnLev")))
 
 #SIMULATED DATA----
-CoP_store=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/CoP_store.mat") 
-info_simul=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/info_simul.mat")
+CoP_store=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/CoP_store2.mat") 
+info_simul=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/info_simul2.mat")
 
 
 nmr= info_simul$info.simul[1] #500 # number of Monte Carlo runs
@@ -295,9 +295,9 @@ tau= info_simul$info.simul[3] #200 # simulation length
 
 k = nrow(refM) # number of variables
 
-Simul_Y=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_Y.mat")
-Simul_P=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_P.mat") #readMat("Data/Simul_PI.mat") #
-Simul_R=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_R.mat") # readMat("Data/Simul_R.mat") #
+Simul_Y=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_Y2.mat")
+Simul_P=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_P2.mat") #readMat("Data/Simul_PI.mat") #
+Simul_R=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_R2.mat") # readMat("Data/Simul_R.mat") #
 #[tau,nmr,ncp]
 
 #-Creation of simulation DF and removals of first errors----
@@ -327,7 +327,7 @@ for(ii in 1:ncp){
 }
 
 ncp=i-1 #number of CoP that have passed the first filtration for error
-
+(ncp)
 #-Adding the trend to the simulated data----
 for (i in 1:ncp){
   for (j in 1:nmr){
@@ -380,9 +380,14 @@ for(i in 1:ncp) {
   
   if (err1==1){
     CoP_err[c(2,3),which(CoP_err[3,]==i)]=c("VarErr",NaN);
+    CoP_err[3,which(as.numeric(CoP_err[3,])>=i)]=as.numeric(CoP_err[3,which(as.numeric(CoP_err[3,])>=i)])-1
+    ####INSERIRE AGGIORNAMENTO DEGLI INDICI SUCCESSIVI, CANCELLO 592, MA NON DICO CHE QUELLO DOPO CHE VA BENE
+    # NON SARA' PIù 593 MA DOVRà ESSERE 592
+    
   }
   if (err2==1){
     CoP_err[c(2,3),which(CoP_err[3,]==i)]=c("ICAErr",NaN);
+    CoP_err[3,which(as.numeric(CoP_err[3,])>=i)]=as.numeric(CoP_err[3,which(as.numeric(CoP_err[3,])>=i)])-1
   }
   print(i)
 }
@@ -395,7 +400,7 @@ ncp=ncp-counter_err
 
 #Computation Frobenius distance
 fb_dist = matrix(0,ncp,nmr)
-for (i in 1:(ncp)) {
+for (i in 1:ncp) {
   fb_dist[i,] = Mres[[i]]$f_dist # MDI for each CoPs and MC runs
 }
 
@@ -427,7 +432,7 @@ for (i in 1:n_pass){
 CoP_colnames=c("alppha","betta","rho_a","rho_nu","rho_z","siggma","varphi","phi_pi","phi_y","epsilon","theta","tau","eta")
 CoP_pass = data.frame(CoP_pass)
 colnames(CoP_pass) = CoP_colnames
-CoP_pass=t(CoP_pass)
+#CoP_pass=t(CoP_pass)
 
 #Computation percentage of discarded CoP due to error
 err_perc=(info_simul$info.simul[2]-ncp)/info_simul$info.simul[2]
@@ -435,8 +440,10 @@ err_perc=(info_simul$info.simul[2]-ncp)/info_simul$info.simul[2]
 
 #rm(list=setdiff(ls(), c("CoP_pass","mPValue.val","lag","refM","CoP_store", "CoP_err","err_perc")))
 
-#MCS <- paste("MCS_calib.csv",sep=",")
-#write.csv(mPValue.val,MCS,col.names=T)
+MCS <- paste("MCS_calib.csv",sep=",")
+write.csv(mPValue.val,MCS,col.names=T)
 
+COP <- paste("CoP_calib.csv",sep=",")
+write.csv(CoP_pass,COP,col.names=T)
 
 
