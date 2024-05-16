@@ -35,6 +35,8 @@ frobICA_mod<-function (M1 = NULL, M2 = NULL, S1 = NULL, S2 = NULL, standardize =
       S1 = scale(S1)
       S2 = scale(S2)
     }
+    
+    #START the real frobICA function
     p = ncol(S1)
     q = ncol(S2)
     if (p < q) {
@@ -148,6 +150,7 @@ fnTest <- function(vMean,vVar,nmr,dA=1) {
     dTest <- drop(nmr*t(mA%*%vMean)%*%solve(mVar2)%*%(mA%*%vMean))
   } else {
     dTest <- nmr*(vMean[1]-vMean[2])^2/(vVar[1]+vVar[2])
+    cat(dTest)
   }
   if (iM>1) {
     dQuan <- qchisq(1-dA,iM-1)
@@ -173,6 +176,7 @@ fnMCS <- function(vMean,vVar,vIndex,dA,verbose=1) {
   iStop <- fnTest(vMean,vVar,dA)$result
   mPValue <- matrix(0,ncol=2,nrow=ncp)
   for (i in 1:iI) {
+    if (verbose==1) cat(i,"-loop \n")
     lTest <- fnTest(vMean,vVar,nmr,dA)
     iStop <- lTest$result
     if (iStop!=1) break
@@ -181,7 +185,7 @@ fnMCS <- function(vMean,vVar,vIndex,dA,verbose=1) {
     vVar <- lElim$var
     vIndex <- lElim$indices
     if (verbose==1) cat("Eliminated COP: ",lElim$elim,"; ","p-value: ", lTest$p,"\n", sep="")
-    if (verbose==1) cat("Remaining COPs:",vIndex,"\n")
+    if (verbose==1) cat("Remaining COPs:",vIndex,"\n\n\n")
     mPValue[i,] <- c(lElim$elim,lTest$p)
   }
   if (i==iI) {
@@ -204,6 +208,8 @@ ratesfnLev <- function(data,L_0,mu_z) {
     levels[j] <- levels[j-1]+growth_rates[j-1] + mu_z 
   }
   return(levels)}
+
+
 
 #CODE----
 #REAL DATA-----
@@ -285,8 +291,8 @@ refM = A_rw
 rm(list=setdiff(ls(), c("n_periods","refM","lag","lm_Y","lm_P","frobICA_mod","fAp_fastICA","fnMean","fnVar","fnTest","fnElim","fnMCS","ratesfnLev")))
 
 #SIMULATED DATA----
-CoP_store=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/CoP_store2.mat") 
-info_simul=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/info_simul2.mat")
+CoP_store=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Heavy_simul/CoP_store.mat") 
+info_simul=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Heavy_simul/info_simul.mat")
 
 
 nmr= info_simul$info.simul[1] #500 # number of Monte Carlo runs
@@ -295,10 +301,14 @@ tau= info_simul$info.simul[3] #200 # simulation length
 
 k = nrow(refM) # number of variables
 
-Simul_Y=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_Y2.mat")
-Simul_P=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_P2.mat") #readMat("Data/Simul_PI.mat") #
-Simul_R=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_R2.mat") # readMat("Data/Simul_R.mat") #
+Simul_Y=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Heavy_simul/Simul_Y.mat")
+Simul_P=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Heavy_simul/Simul_P.mat") #readMat("Data/Simul_PI.mat") #
+Simul_R=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Heavy_simul/Simul_R.mat") # readMat("Data/Simul_R.mat") #
 #[tau,nmr,ncp]
+
+Simul_Y=Simul_Y$Simul.Y
+Simul_P=Simul_P$Simul.P
+Simul_R=Simul_R$Simul.R
 
 #-Creation of simulation DF and removals of first errors----
 if (n_periods>tau) {
@@ -309,18 +319,18 @@ D = list()
 i=1
 CoP_err=matrix(NaN,3,ncp);
 for(ii in 1:ncp){
-  CoP_err[c(1,2),ii]=c(ii,"MatlabErr")
+  CoP_err[c(1,2),ii]=c(ii,"MatlabErr");
   #Check if the simulation had problems in Matlab
-  if (!( is.nan(Simul_Y$Simul.Y[tau,nmr,ii])      | 
-         abs(Simul_Y$Simul.Y[tau,nmr,ii])>10e+2   |
-         abs(Simul_Y$Simul.Y[tau,nmr,ii])<10e-14  ) ){ 
+  if (!( is.nan(Simul_Y[tau,nmr,ii])      | 
+         abs(Simul_Y[tau,nmr,ii])>10e+2   |
+         abs(Simul_Y[tau,nmr,ii])<10e-14  ) ){ #if there are no error
     D[[i]] = list()
     D[[i]]$list = list()
     for (j in 1:nmr){
-      D[[i]]$list[[j]] = as.data.frame(cbind(Simul_Y$Simul.Y[((tau-n_periods)+1):tau,j,ii],Simul_P$Simul.P[((tau-n_periods)+1):tau,j,ii],Simul_R$Simul.R[((tau-n_periods)+1):tau,j,ii]))
+      D[[i]]$list[[j]] = as.data.frame(cbind(Simul_Y[((tau-n_periods)+1):tau,j,ii],Simul_P[((tau-n_periods)+1):tau,j,ii],Simul_R[((tau-n_periods)+1):tau,j,ii]))
       colnames(D[[i]]$list[[j]]) = c('Y','P','R')
     }
-    CoP_err[c(1,2,3),ii]=c(ii,"NoErr",i)
+    CoP_err[c(1,2,3),ii]=c(ii,"NoErr",i);
     i=i+1
   }
   print(ii)
@@ -328,6 +338,9 @@ for(ii in 1:ncp){
 
 ncp=i-1 #number of CoP that have passed the first filtration for error
 (ncp)
+if (ncp==0){
+  stop("None configuration pass the test, so the script end here")
+}
 #-Adding the trend to the simulated data----
 for (i in 1:ncp){
   for (j in 1:nmr){
@@ -337,37 +350,160 @@ for (i in 1:ncp){
 }
 
 #-Estimation minimum distance mixing matrix procedure----
-Mres = as.list(1:ncp)
+
+m_VAR=as.list(1:ncp)#lapply(D[[CoP_err[1,which(CoP_err[3,]==1)]]][[1]],VAR,p=lag)
+VarErr_loc1=array(dim=0)
+VarErr_loc2=rep(0,ncp)
+#-1 I estimate the var and compute the minimum number of mcr
+
+#Function needed otherwise R is not able to handle the variable m_VAR that
+#saving everything instead of just residuals and coeff became 21 GB heavy
+fn_m_VAR = function(x, p_lag) {
+  A=VAR(x, p = p_lag)
+  residuals = residuals(A)
+  coefficients = coefficients(A)
+  results <- list(residuals = residuals, coefficients = coefficients)
+  return(results)
+}
+
+for (i in 1:ncp){
+        print(i)
+        err1=0
+        m_VAR[[i]] <- tryCatch(
+          { lapply(D[[i]][[1]],fn_m_VAR, p_lag=lag)},
+          error = function(e) {
+            err1<<-1
+            return(NaN) #In case of problem I assign a Nan value
+          }
+        )
+        
+        if (err1==1){
+          VarErr_loc1=c(VarErr_loc1,i)
+          VarErr_loc2[i]=1
+        }
+}
+
+#other solution less elegant----------
+# D1=D[1:50];
+# D2=D[51:100];
+# D3=D[101:150];
+# D4=D[151:200];
+# D5=D[201:250];
+# D6=D[251:300];
+# D7=D[301:350];
+# D8=D[351:400];
+# D9=D[401:ncp];
+# m_VAR=as.list(1:50)
+# 
+# n_n_var=1
+# applica_var=function(x) {
+#   print(n_n_var)
+#   n_n_var<<-n_n_var+1
+#   return(lapply(x$list,VAR,p=lag))
+# }
+# 
+# 
+# n_quantile=21
+# quan=round(quantile(1:ncp,probs =seq(0,1, 1/n_quantile)))
+# for(j in 1:n_quantile){
+#   if(j==n_quantile){
+#     m_VAR=as.list(1:50)
+#     m_VAR=lapply(D[quan[j]:(quan[j+1]-1)], applica_var);
+#     save(m_VAR, file = paste0("your_variable_q",j,".RData"))
+#     # Remove the variable from the environment
+#     rm(m_VAR)
+#   }
+#   else{
+#     m_VAR=as.list(1:50)
+#     m_VAR=lapply(D[quan[j]:(quan[j+1]-1)], applica_var);
+#     save(m_VAR, file = paste0("your_variable_q",j,".RData"))
+#     # Remove the variable from the environment
+#     rm(m_VAR)
+#   }
+#   print("one quantile is gone!")
+# }
+
+###--------
+
+for (i in VarErr_loc1){
+  CoP_err[c(2,3),which(CoP_err[3,]==i)]=c("VarErr",NaN);
+}
+ncp=ncp-length(VarErr_loc1)
+CoP_err[3,which(CoP_err[3,]!=NaN)]=1:ncp
+#I remove the problematic Var and update the ncp
+m_VAR=m_VAR[!VarErr_loc2]
+
+
+
+#2- I Check the normality and save the number of MC how pass JB test
+
+# Function to compute JB test to m_res
+fnJB = function(x){
+  A=x$residuals
+  return(c(jarque.test(A[,1])$p.value,jarque.test(A[,2])$p.value,jarque.test(A[,3])$p.value))
+}
+
+fnJBpass=function(x,alppha=NULL){
+  nmc=rep(0,length(x))
+  if (is.null(alppha)){alppha=0.05}
+  for (i in 1:length(x)){
+   if(sum(is.nan(x[[i]]))==0){
+      if(sum(x[[i]]<alppha)==length(x[[i]])){
+        nmc[i]=1
+      }
+    }
+  }
+  return(nmc)
+}
+
+
+nmr_pass = as.list(1:ncp)
+JBErr_loc1=array(dim=0)
+JBErr_loc2=rep(0,ncp)
+JB_threshold=70
 for(i in 1:ncp) {
-  err1=0
+  print(i)
+  #nmr_pass[[i]] = rep(0,nmr)
+  #Test of non normality
+  Non_Nomarlity_test=lapply(m_VAR[[i]],fnJB)
+  nmr_pass[[i]]=fnJBpass(Non_Nomarlity_test)
+  if (sum(nmr_pass[[i]])<JB_threshold) {
+    JBErr_loc1=c(JBErr_loc1,i)
+    JBErr_loc2[i]=1
+  }
+}
+#CoP_err[3,which(as.numeric(CoP_err[3,])>=i)]=as.numeric(CoP_err[3,which(as.numeric(CoP_err[3,])>=i)])-1
+
+
+for (i in JBErr_loc1){
+  CoP_err[c(2,3),which(CoP_err[3,]==i)]=c("JBErr",NaN);
+}
+
+ncp=ncp-length(JBErr_loc1)
+CoP_err[3,which(CoP_err[3,]!=NaN)]=1:ncp
+m_VAR=m_VAR[!JBErr_loc2]
+
+#4- Estimation minimum distance mixing matrix procedure----
+Mres = as.list(1:ncp)
+ICAErr_loc1=array(dim=0)
+ICAErr_loc2=rep(0,ncp)
+
+for(i in 1:ncp) {
   err2=0
   Mres[[i]] <- list()
   Mres[[i]]$m_ica <- as.list(1:nmr) # it delivers a mixing matrix for each monte carlo run
   Mres[[i]]$f_dist <- rep(NA,nmr)
   Mres[[i]]$ica_perm <- as.list(1:nmr)
   
-  #estimate VARs
-  
-  m_VAR <- tryCatch(
-           { lapply(D[[i]][[1]],VAR,p=lag)},
-            error = function(e) {
-            err1<<-1
-            return(m_VAR) #In case of problem I assign the previous Var 
-           }
-           )
-  
-  m_res <- lapply(m_VAR,residuals) # residuals of model data
-  #VAR coefficients
-  AA <- lapply(m_VAR,coef)
-  
   #estimate mixing matrix using fastICA
   Mres[[i]]$m_ica <-  tryCatch(
-                      { lapply(m_res,fAp_fastICA,sseed=46)},# mixing matrices of model data
-                      error = function(e) {
-                        err2<<-1
-                        return(Mres[[i-1]]$m_ica) #In case of problem I put the previous 
-                      }
-                      )
+    { A=lapply(m_VAR[[i]],function(x){x$residuals})
+      lapply(A,fAp_fastICA,sseed=46)},# mixing matrices of model data
+    error = function(e) {
+      err2<<-1
+      return(NaN) 
+    }
+  )
   mt_ica <- lapply(Mres[[i]]$m_ica,t)
   fb <- lapply(mt_ica,frobICA_mod,refM)
   perm <- list()
@@ -378,25 +514,22 @@ for(i in 1:ncp) {
   }
   Mres[[i]]$ica_perm <- Map(function(x, y)x%*%y,Mres[[i]]$m_ica,perm)
   
-  if (err1==1){
-    CoP_err[c(2,3),which(CoP_err[3,]==i)]=c("VarErr",NaN);
-    CoP_err[3,which(as.numeric(CoP_err[3,])>=i)]=as.numeric(CoP_err[3,which(as.numeric(CoP_err[3,])>=i)])-1
-    ####INSERIRE AGGIORNAMENTO DEGLI INDICI SUCCESSIVI, CANCELLO 592, MA NON DICO CHE QUELLO DOPO CHE VA BENE
-    # NON SARA' PIù 593 MA DOVRà ESSERE 592
-    
-  }
+  
   if (err2==1){
-    CoP_err[c(2,3),which(CoP_err[3,]==i)]=c("ICAErr",NaN);
-    CoP_err[3,which(as.numeric(CoP_err[3,])>=i)]=as.numeric(CoP_err[3,which(as.numeric(CoP_err[3,])>=i)])-1
+    ICAErr_loc1=c(ICAErr_loc1,i)
+    ICAErr_loc2[i]=1
   }
   print(i)
+  }
+ 
+
+for (i in ICAErr_loc1){
+  CoP_err[c(2,3),which(CoP_err[3,]==i)]=c("ICAErr",NaN);
 }
 
-#Removal from Mres of Problematic CoP and update of the number of CoP
-counter_err=length(Mres)
-Mres=unique(Mres)
-counter_err=counter_err-length(Mres)
-ncp=ncp-counter_err
+ncp=ncp-length(ICAErr_loc1)
+CoP_err[3,which(CoP_err[3,]!=NaN)]=1:ncp
+
 
 #Computation Frobenius distance
 fb_dist = matrix(0,ncp,nmr)
@@ -413,23 +546,23 @@ mVal = mVal[order(mVal[,2],decreasing=T),]
 
 
 dA = 1
-
+alpha=0.05 #significance
 #Check if there is enough MC in order to have a variance different from 0
 if (sum(vVar.val==0)==0){
-  mPValue.val = fnMCS(vMean.val,vVar.val,1:ncp,dA,verbose=0)
+  mPValue.val = fnMCS(vMean.val,vVar.val,1:ncp,dA,verbose=1)
   mPValue.val = cbind(mPValue.val,mVal[,2:3])
-  vCoP.pass = mPValue.val[which(mPValue.val[,2]>0.05)]  
+  vCoP.pass = mPValue.val[which(mPValue.val[,2]>alpha)]  
 } else {
   warning("The variance of at least one CoP is equal to 0")
   vCoP.pass = which(vVar.val==0)
 }
 
 n_pass=length(vCoP.pass)
-CoP_pass=matrix(0,n_pass,13)
+CoP_pass=matrix(0,n_pass,size(CoP_store$CoP.store)[2])
 for (i in 1:n_pass){
   CoP_pass[i,]= CoP_store$CoP.store[which(CoP_err[3,]==vCoP.pass[i]),]
 }
-CoP_colnames=c("alppha","betta","rho_a","rho_nu","rho_z","siggma","varphi","phi_pi","phi_y","epsilon","theta","tau","eta")
+CoP_colnames=c("alppha","betta","rho_a","rho_nu","rho_z","siggma","varphi","phi_pi","phi_y","epsilon","theta","eta")
 CoP_pass = data.frame(CoP_pass)
 colnames(CoP_pass) = CoP_colnames
 #CoP_pass=t(CoP_pass)
@@ -445,5 +578,4 @@ write.csv(mPValue.val,MCS,col.names=T)
 
 COP <- paste("CoP_calib.csv",sep=",")
 write.csv(CoP_pass,COP,col.names=T)
-
 

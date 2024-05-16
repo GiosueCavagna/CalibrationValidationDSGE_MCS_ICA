@@ -4,7 +4,7 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
     clean_dynare_files;
     
     
-    
+    rng(1,"twister");
     %----------------------------------------------------------------
     % 1. Paramethers Declaration
     %----------------------------------------------------------------
@@ -26,10 +26,10 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
     theta   =   3/4;  %11 % Calvo parameter [0,1]
     
     %I will not calibrate tau and eta
-    tau     =    0;   %12          %params_t(12); %0;      %labor subsidy
+    %tau     =    0;   %12          %params_t(12); %0;      %labor subsidy
     eta     =    3.77;%13          %params_t(13); %3.77;   % semielasticity of money demand 
 
-    params = [alppha,betta,rho_a,rho_nu,rho_z,siggma,varphi,phi_pi,phi_y,epsilon,theta,tau,eta];
+    params = [alppha,betta,rho_a,rho_nu,rho_z,siggma,varphi,phi_pi,phi_y,epsilon,theta,eta];
     
     %This CoP do not satisfies the rank consdition.
     %params =[0.562500000000000,0.437500000000000,0.187500000000000,0.812500000000000,0.687500000000000,1.06250000000000,8.93750000000000,0.312500000000000,0.312500000000000,6.87500000000000,0.562500000000000,0,3.77000000000000];
@@ -45,7 +45,7 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
     Simul_Pi=zeros(periods,n_MC,n_CoP);
     Simul_R=zeros(periods,n_MC,n_CoP);
     
-    VarNames ={'C';'W_real';'Pi';'A';'N';'R';'realinterest';'Y';'Q';'Z';'S';'Pi_star';'x_aux_1';'x_aux_2';'MC';'M_real';'i_ann';'pi_ann';'r_real_ann';'P';'log_m_nominal';'log_y';'log_W_real';'log_N';'log_P';'log_A';'log_Z';'nu'};
+    VarNames ={'C';'W_real';'Pi';'A';'N';'R';'realinterest';'Y';'Q';'Z';'S';'Pi_star';'x_aux_1';'x_aux_2';'MC';'nu';'P'};%;'M_real';'i_ann';'pi_ann';'r_real_ann';'log_m_nominal';'log_y';'log_W_real';'log_N';'log_P';'log_A';'log_Z'};
     
     %Creation txt file that will be importend during dynare execution in
     %order to insert the number of periods
@@ -58,8 +58,7 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
     %c_e2=0; %rank condition not verified
 
     %Inizialization store_CoP
-    CoP_store=zeros(n_CoP,13);
-
+    CoP_store=zeros(n_CoP,length(params));
     %Main loop simulation
     for i=1:n_CoP
 
@@ -67,7 +66,7 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
         if i==1 %The first parametrization is the standard parametrization
             params_t=params; 
         else    %Other Cop with constraint of specific parameters
-            params_t= [q(i+1,1:11),tau,eta];
+            params_t= [q(i+1,1:11),eta];
             params_t(6)= params_t(6)+0.5; %limitation siggma
             params_t(7)= (params_t(7)*9)+0.5; %limitation varphi
             params_t(8)=  params_t(8)*5; %limiation phi_pi
@@ -76,11 +75,13 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
 
         %MC simulation
         for j=1:n_MC
+            my_seed=randi(n_MC*n_CoP*2);
             fprintf('\n\n\n\n\nNUMBER OF CoP = %d',i)
             fprintf('\nNUMBER OF MC = %d\n\n\n\n\n',j)
 
             save myparam_values.mat params_t;
-    
+            save my_seed.mat my_seed;
+
             error=0;
     
             try
@@ -128,12 +129,13 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
     %delete NK_NL_DSGE.jnl
     delete util.txt
     delete myparam_values.mat
+    delete my_seed.mat
         
     %it is saved the results of the simulation 
     %save Simulated_Data/Simul_logY.mat Simul_logY
-    save Simulated_Data/Simul_Y2.mat Simul_Y
-    save Simulated_Data/Simul_P2.mat Simul_P
-    save Simulated_Data/Simul_R2.mat Simul_R
+    save Simulated_Data/Simul_Y.mat Simul_Y
+    save Simulated_Data/Simul_P.mat Simul_P
+    save Simulated_Data/Simul_R.mat Simul_R
 
     
     

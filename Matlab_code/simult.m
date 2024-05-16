@@ -79,27 +79,28 @@ nxs = length(i_exo_var);
 DynareResults.exo_simul = zeros(DynareOptions.periods,DynareModel.exo_nbr);
 chol_S = chol(DynareModel.Sigma_e(i_exo_var,i_exo_var));
 
+%ADDED BY ME-----------------------------------------
+beta=1/sqrt(2); %this allows to set by var in exo shock block the variance since V=2*beta^2*var
+%----------------------------------------------------
+
 for i=1:replic
     if ~isempty(DynareModel.Sigma_e)
-
+        
         %-----------------ORIGINAL PART------------------------------------
         
-        % we fill the shocks row wise to have the same values
-        % independently of the length of the simulation
+         %we fill the shocks row wise to have the same values
+         %independently of the length of the simulation
         %DynareResults.exo_simul(:,i_exo_var) = randn(nxs,DynareOptions.periods)'*chol_S;
         %------------------------------------------------------------------
 
 
         %-----------------MODIFIED PART------------------------------------
         %In order to get non-normal shock let compute a lapalce shock.
-        x1 = rand(nxs,DynareOptions.periods);  %axuiliary variable 1
-        x2 = rand(nxs,DynareOptions.periods);  %axuiliary variable 2
-        x = log(x1./x2);
-        x=(x - mean(x))./std(x);
+        x1 = exprnd(beta,nxs,DynareOptions.periods);  %axuiliary variable 1
+        x2 = exprnd(beta,nxs,DynareOptions.periods);  %axuiliary variable 2
+        x = x1-x2;
         DynareResults.exo_simul(:,i_exo_var) = x'*chol_S;
         %------------------------------------------------------------------
-
-
     end
     y_ = simult_(DynareModel,DynareOptions,y0,dr,DynareResults.exo_simul,order);
     % elimninating initial value
