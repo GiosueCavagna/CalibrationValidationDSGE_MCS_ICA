@@ -15,23 +15,18 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
     rho_a   =   0.9;  %3  % autocorrelation tech schok [0,1)
     rho_nu  =   0.5;  %4  % autocorrelation monetary policy [0,1)
     rho_z   =   0.5;  %5  % autocorrelation monetary demand [0,1)
-    siggma  =   1;    %6  % inverse of elasticity of temporal sobstitution of consumption (0,+inf) but we limitate it in [0.5,1,5] 
-                                % since u is a CRRA if siggma->0 then the u is linear    %% q(i,6)+0.5
-    varphi  =   5;    %7  % inverse of elasticity of temporal sobstitution of labor (0,+inf) but we limitate it in [0.5,9.5]
-                                % (q(i,7)*9)+0.5
-    phi_pi  =   1.5;  %8  % inflation feedback taylor rule [0,+inf) but we limitate it in [0,5] q(i,8)*5
-    phi_y   =   0.125;%9  % output feedback taylor rule [0,+inf) but we limitate it in [0,1]
-    
-    epsilon =   9;    %10  % demand elasticity (0,+inf)but we limitate it in [5,15] (q(i,11)*10)+5
+    siggma  =   1;    %6  % inverse of elasticity of temporal sobstitution of consumption (0,+inf) 
+    varphi  =   5;    %7  % inverse of elasticity of temporal sobstitution of labor (0,+inf) 
+    phi_pi  =   1.5;  %8  % inflation feedback taylor rule [0,+inf)
+    phi_y   =   0.125;%9  % output feedback taylor rule [0,+inf) 
+    epsilon =   9;    %10  %demand elasticity (0,+inf)
     theta   =   3/4;  %11 % Calvo parameter [0,1]
-    
-    %I will not calibrate tau and eta
-    %tau     =    0;   %12          %params_t(12); %0;      %labor subsidy
+    %I will not calibrate eta
     eta     =    3.77;%13          %params_t(13); %3.77;   % semielasticity of money demand 
 
     params = [alppha,betta,rho_a,rho_nu,rho_z,siggma,varphi,phi_pi,phi_y,epsilon,theta,eta];
     
-    %This CoP do not satisfies the rank consdition.
+    %This CoP do not satisfixes the rank consdition.
     %params =[0.562500000000000,0.437500000000000,0.187500000000000,0.812500000000000,0.687500000000000,1.06250000000000,8.93750000000000,0.312500000000000,0.312500000000000,6.87500000000000,0.562500000000000,0,3.77000000000000];
 
     q=sobolset(11);
@@ -67,10 +62,17 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
             params_t=params; 
         else    %Other Cop with constraint of specific parameters
             params_t= [q(i+1,1:11),eta];
-            params_t(6)= params_t(6)+0.5; %limitation siggma
-            params_t(7)= (params_t(7)*9)+0.5; %limitation varphi
-            params_t(8)=  params_t(8)*5; %limiation phi_pi
-            params_t(10)=  (params_t(10)*10)+5; %limitation epsilon
+            params_t(1)=(params_t(1)*params(1)*0.40)+params(1)*0.8;     %limitation at -20% + 20%
+            params_t(2)=(params_t(2)*params(2)*0.20)+params(2)*0.8;     %limitation at -20% + 0%
+            params_t(3)=(params_t(3)*params(3)*0.31)+params(3)*0.8;     %limitation at -20% + 11%
+            params_t(4)=(params_t(4)*params(4)*0.40)+params(4)*0.8;     %limitation at -20% + 20%
+            params_t(5)=(params_t(5)*params(5)*0.40)+params(5)*0.8;     %limitation at -20% + 20%
+            params_t(6)=(params_t(6)*params(6)*0.40)+params(6)*0.8;     %limitation at -20% + 20%
+            params_t(7)=(params_t(7)*params(7)*0.40)+params(7)*0.8;     %limitation at -20% + 20%
+            params_t(8)=(params_t(8)*params(8)*0.40)+params(8)*0.8;     %limitation at -20% + 20%
+            params_t(9)=(params_t(9)*params(9)*0.40)+params(9)*0.8;     %limitation at -20% + 20%
+            params_t(10)=(params_t(10)*params(10)*0.40)+params(10)*0.8; %limitation at -20% + 20%
+            params_t(11)=(params_t(11)*params(11)*0.40)+params(11)*0.8; %limitation at -20% + 20%
         end
 
         %MC simulation
