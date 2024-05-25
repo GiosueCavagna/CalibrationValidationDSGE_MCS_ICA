@@ -574,8 +574,8 @@ err_perc=(info_simul$info.simul[2]-ncp)/info_simul$info.simul[2]
 #rm(list=setdiff(ls(), c("CoP_pass","mPValue.val","lag","refM","CoP_store", "CoP_err","err_perc")))
 
 MCS <- paste("MCS_calib.tsv",sep=",")
-write.tsv(mPValue.val,MCS,col.names=T)
+write.csv(mPValue.val,MCS,col.names=T)
 
 COP <- paste("CoP_calib.tsv",sep=",")
-write.tsv(CoP_pass,COP,col.names=T)
+write.csv(CoP_pass,COP,col.names=T)
 
