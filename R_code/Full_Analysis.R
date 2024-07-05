@@ -12,6 +12,11 @@ library(R.matlab)
 library(devtools)
 #install_github("STieleman/svarCAL")
 library(svarCAL)
+library(foreign)
+library(xtable)
+library(stargazer)
+library(readr)
+
 
 #FUNCTION----
 
@@ -274,7 +279,7 @@ colnames(D) <- c("Y", "P", "R")
 
 #-Data elaboration----
 
-infocrit = VARselect(D, lag.max=6, type="const")
+infocrit = VARselect(D, lag.max=10, type="const")
 lag = infocrit$selection["AIC(n)"]
 varest = VAR(D, p=lag, type="const")
 ures = resid(varest)
@@ -291,8 +296,8 @@ refM = A_rw
 rm(list=setdiff(ls(), c("n_periods","refM","lag","lm_Y","lm_P","frobICA_mod","fAp_fastICA","fnMean","fnVar","fnTest","fnElim","fnMCS","ratesfnLev")))
 
 #SIMULATED DATA----
-CoP_store=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Heavy_simul/CoP_store.mat") 
-info_simul=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Heavy_simul/info_simul.mat")
+CoP_store=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/CoP_store.mat") 
+info_simul=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/info_simul.mat")
 
 
 nmr= info_simul$info.simul[1] #500 # number of Monte Carlo runs
@@ -301,9 +306,9 @@ tau= info_simul$info.simul[3] #200 # simulation length
 
 k = nrow(refM) # number of variables
 
-Simul_Y=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Heavy_simul/Simul_Y.mat")
-Simul_P=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Heavy_simul/Simul_P.mat") #readMat("Data/Simul_PI.mat") #
-Simul_R=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Heavy_simul/Simul_R.mat") # readMat("Data/Simul_R.mat") #
+Simul_Y=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_Y.mat")
+Simul_P=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_P.mat") #readMat("Data/Simul_PI.mat") #
+Simul_R=readMat("~/Documents/CalibrationValidationDSGE_MCS_ICA/Matlab_code/Simulated_Data/Simul_R.mat") # readMat("Data/Simul_R.mat") #
 #[tau,nmr,ncp]
 
 Simul_Y=Simul_Y$Simul.Y
@@ -541,7 +546,8 @@ for (i in 1:ncp) {
 
 vMean.val = apply(fb_dist,1,fnMean)
 vVar.val = apply(fb_dist,1,fnVar)
-mVal = cbind(1:ncp,vMean.val,vVar.val)
+
+mVal = cbind(which(CoP_err[3,]%in%1:ncp),vMean.val,vVar.val)
 mVal = mVal[order(mVal[,2],decreasing=T),]
 
 
@@ -549,8 +555,8 @@ dA = 1
 alpha=0.05 #significance
 #Check if there is enough MC in order to have a variance different from 0
 if (sum(vVar.val==0)==0){
-  mPValue.val = fnMCS(vMean.val,vVar.val,1:ncp,dA,verbose=1)
-  mPValue.val = cbind(mPValue.val,mVal[,2:3])
+  mPValue.val = fnMCS(vMean.val,vVar.val,1:ncp,dA,verbose=0)
+  mPValue.val = cbind(mPValue.val,mVal)
   vCoP.pass = mPValue.val[which(mPValue.val[,2]>alpha)]  
 } else {
   warning("The variance of at least one CoP is equal to 0")
@@ -572,10 +578,30 @@ err_perc=(info_simul$info.simul[2]-ncp)/info_simul$info.simul[2]
 
 
 #rm(list=setdiff(ls(), c("CoP_pass","mPValue.val","lag","refM","CoP_store", "CoP_err","err_perc")))
-
-MCS <- paste("MCS_calib.tsv",sep=",")
+#PRINT AND SAVE------------
+MCS <- paste("MCS_calib.csv",sep=",")
 write.csv(mPValue.val,MCS,col.names=T)
 
-COP <- paste("CoP_calib.tsv",sep=",")
+COP <- paste("CoP_calib.csv",sep=",")
 write.csv(CoP_pass,COP,col.names=T)
+
+CoP_calib <- read_csv("CoP_calib.csv")
+MCS_calib <- read_csv("MCS_calib.csv")
+
+
+MCS_calib_print=as.matrix(MCS_calib[c(1:5,378,391:396),c(1,2,3,5)])
+MCS_calib_print[,3]=MCS_calib_print[order(MCS_calib_print[,3]),3]
+MCS_calib_print[,c(1,2)]=as_string(MCS_calib_print[,c(1,2)])
+names=c("j" , "e_{\mathcal{M}_j}" , "\text{MCS p-value} (\hat p_{e_{\mathcal{M}_j}})", "\hat D_j^(500)" )
+
+
+CoP_calib=as.data.frame(c(CoP_calib[,1:12],MCS_calib[384:396,3]))
+CoP_calib=CoP_calib %>% arrange(...3)
+CoP_calib$...1=1:13
+CoP_calib_1=CoP_calib[,2:7]
+CoP_calib_2=CoP_calib[,8:13]
+
+print(xtable(CoP_calib_1, type = "latex"), file = "CoP_calib_1.tex")
+print(xtable(CoP_calib_2, type = "latex"), file = "CoP_calib_2.tex")
+print(xtable(MCS_calib_print, type = "latex",digits = 4), file = "MCS_calib.tex")
 

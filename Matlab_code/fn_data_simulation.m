@@ -21,7 +21,6 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
     phi_y   =   0.125;%9  % output feedback taylor rule [0,+inf) 
     epsilon =   9;    %10  %demand elasticity (0,+inf)
     theta   =   3/4;  %11 % Calvo parameter [0,1]
-    %I will not calibrate eta
     eta     =    3.77;%13          %params_t(13); %3.77;   % semielasticity of money demand 
 
     params = [alppha,betta,rho_a,rho_nu,rho_z,siggma,varphi,phi_pi,phi_y,epsilon,theta,eta];
@@ -29,7 +28,7 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
     %This CoP do not satisfixes the rank consdition.
     %params =[0.562500000000000,0.437500000000000,0.187500000000000,0.812500000000000,0.687500000000000,1.06250000000000,8.93750000000000,0.312500000000000,0.312500000000000,6.87500000000000,0.562500000000000,0,3.77000000000000];
 
-    q=sobolset(11);
+    q=sobolset(length(params));
     %----------------------------------------------------------------
     %n_MC=2;
     %n_CoP=2;
@@ -61,7 +60,7 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
         if i==1 %The first parametrization is the standard parametrization
             params_t=params; 
         else    %Other Cop with constraint of specific parameters
-            params_t= [q(i+1,1:11),eta];
+            params_t= [q(i+1,1:12)];
             params_t(1)=(params_t(1)*params(1)*0.40)+params(1)*0.8;     %limitation at -20% + 20%
             params_t(2)=(params_t(2)*params(2)*0.20)+params(2)*0.8;     %limitation at -20% + 0%
             params_t(3)=(params_t(3)*params(3)*0.31)+params(3)*0.8;     %limitation at -20% + 11%
@@ -73,6 +72,7 @@ function [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods)
             params_t(9)=(params_t(9)*params(9)*0.40)+params(9)*0.8;     %limitation at -20% + 20%
             params_t(10)=(params_t(10)*params(10)*0.40)+params(10)*0.8; %limitation at -20% + 20%
             params_t(11)=(params_t(11)*params(11)*0.40)+params(11)*0.8; %limitation at -20% + 20%
+            params_t(12)=(params_t(12)*params(12)*0.40)+params(12)*0.8; %limitation at -20% + 20%
         end
 
         %MC simulation

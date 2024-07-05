@@ -1,7 +1,8 @@
 clc
 clear all
-n_MC=1;
-n_CoP=1;
+
+n_MC=200;
+n_CoP=500;
 periods=300;
 tic
 [CoP_store]=fn_data_simulation(n_MC,n_CoP,periods);
